@@ -31,6 +31,7 @@ import cv2
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 # ── Resolve model1/ directory so imports work regardless of cwd ──────────────
@@ -75,12 +76,23 @@ class SharedState:
     def __init__(self):
         self._lock   = threading.Lock()
         self._result = EngagementResult()   # default "empty" result
+        self._frame  = None                 # latest JPEG-encoded frame
         self.running = False
         self.error   = None
 
     def update(self, result: EngagementResult):
         with self._lock:
             self._result = result
+
+    def update_frame(self, frame):
+        """Store the latest camera frame (raw BGR numpy array)."""
+        with self._lock:
+            self._frame = frame
+
+    def get_frame(self):
+        """Return the latest camera frame."""
+        with self._lock:
+            return self._frame
 
     def get(self) -> EngagementResult:
         with self._lock:
@@ -121,6 +133,7 @@ def _capture_loop():
                     continue
                 result = pipeline.process_frame(frame)
                 state.update(result)
+                state.update_frame(frame.copy())
     except Exception as e:
         state.error = str(e)
     finally:
@@ -275,6 +288,34 @@ def all_metrics():
         head_nod          = r.head_nod,
         head_shake        = r.head_shake,
     )
+# ── Video stream (MJPEG) ──────────────────────────────────────────────────────
+
+def _generate_mjpeg():
+    """Yield MJPEG frames for the /video_feed streaming endpoint."""
+    while state.running:
+        frame = state.get_frame()
+        if frame is None:
+            time.sleep(0.03)
+            continue
+        _, jpeg = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
+        yield (
+            b'--frame\r\n'
+            b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n'
+        )
+        time.sleep(0.033)  # ~30 fps cap
+
+
+@app.get("/video_feed", tags=["Video"])
+def video_feed():
+    """MJPEG video stream of the live camera feed."""
+    if not state.running:
+        raise HTTPException(status_code=503, detail="Pipeline not running.")
+    return StreamingResponse(
+        _generate_mjpeg(),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+    )
+
+
 # ─── Entry point ──────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":

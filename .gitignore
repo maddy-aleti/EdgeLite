@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+uploads/
+node_modules/
+package-lock.json
+package.json
+.env
+__pycache__/
+generate_model.py
+optimized
+sample_8mb_model.pt
+sample_128mb_model.pt

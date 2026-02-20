@@ -80,7 +80,7 @@ GESTURE_DEADZONE    = 0.008      # Ignore tiny movements (normalised units)
 # ─── CSV Logging ─────────────────────────────────────────────────────────────
 LOG_DIR             = os.path.join(_DIR, "logs")
 LOG_FILENAME        = "session_log.csv"   # Relative to LOG_DIR
-LOG_INTERVAL_FRAMES = 30                  # Write one row every N frames (~1 s)
+LOG_INTERVAL_FRAMES = 90                  # Write one row every N frames (~3 s)
 
 CSV_COLUMNS = [
     "timestamp",
