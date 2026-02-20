@@ -1,0 +1,12 @@
+# Edge AI Classroom Engagement Monitor — Python dependencies
+# Install with:  pip install -r requirements.txt
+
+# ── Core inference ──────────────────────────────────────────────────────────
+mediapipe>=0.10.14          # MediaPipe FaceLandmarker (includes BlazeFace + mesh)
+opencv-python>=4.9.0        # Webcam capture + display overlay
+
+# ── Numerical computing ─────────────────────────────────────────────────────
+numpy>=1.26.0               # Array ops for landmark coordinates
+
+# ── Standard library only (no extra installs needed for):
+# csv, collections, datetime, math, time, os, sys, argparse
