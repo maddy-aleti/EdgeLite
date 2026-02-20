@@ -8,5 +8,9 @@ opencv-python>=4.9.0        # Webcam capture + display overlay
 # ── Numerical computing ─────────────────────────────────────────────────────
 numpy>=1.26.0               # Array ops for landmark coordinates
 
+# ── FastAPI backend ─────────────────────────────────────────────────────────
+fastapi>=0.110.0            # REST API framework
+uvicorn[standard]>=0.29.0   # ASGI server to run FastAPI
+
 # ── Standard library only (no extra installs needed for):
-# csv, collections, datetime, math, time, os, sys, argparse
+# csv, collections, datetime, math, time, os, sys, argparse, threading
