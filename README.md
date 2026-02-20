@@ -200,6 +200,9 @@ python -m uvicorn api_server:app --host 0.0.0.0 --port 8001 --reload
 cd optimization-service
 pip install -r requirements.txt
 python main.py
+# Run as API server (Swagger at http://localhost:8001/docs)
+python -m uvicorn api_server:app --host 0.0.0.0 --port 8001 --reload
+```
 ```
 
 ### Backend (Node.js + Express + MongoDB)
